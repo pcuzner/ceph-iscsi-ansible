@@ -1,0 +1,6 @@
+---
+# Defines iSCSI Gateway Nodes
+
+- hosts: ceph-iscsi-gw
+  roles:
+  - ceph-iscsi-gw

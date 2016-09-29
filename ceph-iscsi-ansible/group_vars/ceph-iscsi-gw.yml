@@ -1,0 +1,25 @@
+
+# Variables for the ceph gateways
+# requires a ceph group entry either in /etc/ansible/hosts or
+# passed as an inventory to ansible-playbook (-i)
+
+gateway_iqn: "iqn.2003-01.com.redhat.iscsi-gw:ceph-igw"
+
+# gateway_ip_list provides a list of the IP Addrresses - one per gateway - that will be used
+# as an iscsi target portal ip
+gateway_ip_list: "192.168.122.101,192.168.122.102"
+
+# rbd_devices defines the images that should be exported from the iscsi gateways
+rbd_devices:
+  - { pool: 'rbd', image: 'ansible1', size: '30G', host: 'ceph-1'}
+  - { pool: 'rbd', image: 'ansible2', size: '15G', host: 'ceph-1'}
+  - { pool: 'rbd', image: 'ansible3', size: '30G', host: 'ceph-1'}
+  - { pool: 'rbd', image: 'ansible4', size: '50G', host: 'ceph-1'}
+#  - { pool: 'rbd', image: 'ansible5', size: '50G', host: 'ceph-1'}
+#  - { pool: 'rbd', image: 'ansible6', size: '5G', host: 'ceph-2'}
+
+
+# client_connections defines the ACL's to restrict client access to specific LUNs
+client_connections:
+  - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'ansible1,ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
+  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'ansible3', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }

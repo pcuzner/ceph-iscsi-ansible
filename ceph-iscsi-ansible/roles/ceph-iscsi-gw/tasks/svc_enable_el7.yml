@@ -1,0 +1,14 @@
+---
+- name: Force rbdmap service to start at boot (static be default, and won't auto-start)
+  file: src=/lib/systemd/system/rbdmap.service dest=/etc/systemd/system/multi-user.target.wants/rbdmap.service state=link
+
+- name: Apply overrides for the 'target' unit
+  copy: src=../files/systemd-src/target.service.d dest=/etc/systemd/system
+
+# for ansible < 2.2, we need to use service and command modules
+# after 2.2 there is a systemd module
+- name: Reload systemd definitions to pick up the changes
+  command: systemctl daemon-reload
+
+- name: Ensure target service is enabled
+  command: systemctl enable target
