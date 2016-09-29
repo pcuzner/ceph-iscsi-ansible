@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of Ceph
 License:        ASL 2.0 
 URL:            https://github.com/pcuzner/ceph-iscsi-ansible
-Source0:        https://github.com/pcuzner/ceph-iscsi-ansible/archive/master.tar.gz
+Source0:        https://github.com/pcuzner/ceph-iscsi-ansible/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 Requires: ansible
@@ -19,7 +19,7 @@ the rbd images exported over LIO.
 To use the playbook you must ensure that the gateway nodes are the ceph-iscsi-config package available/installed.
 
 %prep
-%setup -q -n %{name}-master
+%setup -q 
 
 #%build
 #
