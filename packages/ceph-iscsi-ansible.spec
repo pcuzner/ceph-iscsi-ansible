@@ -21,8 +21,7 @@ To use the playbook you must ensure that the gateway nodes are the ceph-iscsi-co
 %prep
 %setup -q 
 
-#%build
-#
+%build
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/ceph-ansible
