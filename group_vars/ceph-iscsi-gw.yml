@@ -21,5 +21,6 @@ rbd_devices:
 
 # client_connections defines the ACL's to restrict client access to specific LUNs
 client_connections:
-  - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'ansible1,ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
-  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'ansible3', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }
+  - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'rbd/ansible1,rbd/ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
+  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }
+#  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }
