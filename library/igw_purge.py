@@ -28,33 +28,33 @@ class LIO(object):
 
     def drop_lun_maps(self, config):
 
-        configured_images = config.config['disks'].keys()
+        # disk_keys = config.config['disks'].keys()
 
-        for stg_object in self.lio_root.storage_objects:
+        for disk_key in config.config['disks'].keys():
 
-            if stg_object.name in configured_images and 'mapper' in stg_object.udev_path:
-                # this is an rbd device that's in the config object, so remove it
-                try:
-                    dm_device = stg_object.udev_path
+            pool, image = disk_key.split('/')
+            dm_device = config.config['disks'][disk_key]['dm_device']
 
-                    stg_object.delete()
-                    dm_remove_device(dm_device)
-                    rbd_unmap(stg_object.name)
+            for stg_object in self.lio_root.storage_objects:
 
-                    self.changed = True
-                    # update the disk item to remove the wwn information
-                    image_metadata = config.config['disks'][stg_object.name]   # current disk meta data dict
-                    image_metadata['wwn'] = ''
-                    config.update_item("disks", stg_object.name, image_metadata)
+                if stg_object.name == image and stg_object.udev_path == dm_device:
 
-                except RTSLibError as err:
-                    self.error = True
-                    self.error_msg = err
+                    # this is an rbd device that's in the config object, so remove it
+                    try:
+                        stg_object.delete()
+                    except RTSLibError as err:
+                        self.error = True
+                        self.error_msg = err
+                    else:
+                        dm_remove_device(dm_device)
+                        rbd_unmap(disk_key)
 
-                except subprocess.CalledProcessError:
-                    self.error = True
-                    self.error_msg = "Unable to unmap {} from {}".format(stg_object.name,
-                                                                         stg_object.udev_path)
+                        self.changed = True
+                        # update the disk item to remove the wwn information
+                        image_metadata = config.config['disks'][disk_key]   # current disk meta data dict
+                        image_metadata['wwn'] = ''
+                        image_metadata['dm_device'] = ''
+                        config.update_item("disks", disk_key, image_metadata)
 
 
 class Gateway(LIO):
@@ -92,10 +92,10 @@ def dm_remove_device(dm_device):
     return rm_ok
 
 
-def rbd_unmap(image_name):
+def rbd_unmap(disk_key):
 
     try:
-        subprocess.check_output("rbd unmap {}".format(image_name), shell=True)
+        subprocess.check_output("rbd unmap {}".format(disk_key), shell=True)
     except subprocess.CalledProcessError:
         unmap_ok = False
     else:
@@ -103,7 +103,7 @@ def rbd_unmap(image_name):
 
         # unmap'd from runtime, now remove from the rbdmap file referenced at boot
         for rbdmap_entry in fileinput.input('/etc/ceph/rbdmap', inplace=True):
-            if image_name in rbdmap_entry:
+            if rbdmap_entry.startswith(disk_key):
                 continue
             print rbdmap_entry.strip()
 
@@ -115,10 +115,10 @@ def delete_group(module, image_list, cfg):
     logger.debug("RBD Images to delete are : {}".format(','.join(image_list)))
     pending_list = list(image_list)
 
-    for image_name in image_list:
-        if delete_rbd(module, image_name):
-            cfg.del_item('disks', image_name)
-            pending_list.remove(image_name)
+    for disk_key in image_list:
+        if delete_rbd(module, disk_key):
+            cfg.del_item('disks', disk_key)
+            pending_list.remove(disk_key)
             cfg.changed = True
 
     if cfg.changed:
@@ -127,12 +127,12 @@ def delete_group(module, image_list, cfg):
     return pending_list
 
 
-def delete_rbd(module, image_name):
+def delete_rbd(module, disk_key):
 
-    logger.debug("issuing delete for {}".format(image_name))
-    rm_cmd = 'rbd --no-progress rm {}'.format(image_name)
+    logger.debug("issuing delete for {}".format(disk_key))
+    rm_cmd = 'rbd --no-progress rm {}'.format(disk_key)
     rc, rm_out, err = module.run_command(rm_cmd, use_unsafe_shell=True)
-    logger.debug("delete RC = ".format(rc))
+    logger.debug("delete RC = {}, {}".format(rc, rm_out, err))
 
     return True if rc == 0 else False
 
@@ -153,7 +153,8 @@ def get_update_host(config):
 
     return potential_hosts[ptr]
 
-def main():
+
+def ansible_main():
 
     fields = {"mode": {"required": True,
                        "type": "str",
@@ -214,7 +215,7 @@ def main():
         # if the owner field for a disk is set to this host, this host can safely delete it
         # nb. owner gets set at rbd allocation and mapping time
         images_left = []
-        # delete_list will contain a list of image names where the owner is this host
+        # delete_list will contain a list of pool/image names where the owner is this host
         delete_list = [key for key in cfg.config['disks'] if cfg.config['disks'][key]['owner'] == this_host]
         if delete_list:
             images_left = delete_group(module, delete_list, cfg)
@@ -243,4 +244,4 @@ if __name__ == '__main__':
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 
-    main()
+    ansible_main()
