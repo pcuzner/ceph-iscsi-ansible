@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        0.5
+Version:        0.6
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of Ceph
 License:        ASL 2.0 
@@ -42,6 +42,10 @@ done
 %{_datarootdir}/ceph-ansible/ceph-iscsi-gw.yml
 
 %changelog
+* Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6.1
+- changed the main function to have an ansible prefix to allow the code to know where it is invoked from
+- updated the purge module to support image names being prefixed by a pool i.e. pool/image
+
 * Tue Sep 27 2016 Paul Cuzner <pcuzner@redhat.com> - 0.5-1
 - initial rpm package
 
