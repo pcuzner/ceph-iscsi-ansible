@@ -10,7 +10,7 @@ from ansible.module_utils.basic import *
 from ceph_iscsi_config.client import GWClient
 
 
-def main():
+def ansible_main():
 
     fields = {
         "client_iqn": {"required": True, "type": "str"},
@@ -75,4 +75,4 @@ if __name__ == '__main__':
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 
-    main()
+    ansible_main()
