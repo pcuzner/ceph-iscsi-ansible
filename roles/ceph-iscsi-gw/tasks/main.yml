@@ -10,10 +10,6 @@
 - include: pkgs_prereqs_el7.yml
   when: ansible_os_family == "RedHat"
 
-# Setup the rbdmap and target services
-- include: svc_enable_el7.yml
-  when: ansible_os_family == "RedHat"
-
 - name: igw_gateway (tgt) | Configure iSCSI Target (gateway)
   igw_gateway: mode="target" gateway_iqn={{ gateway_iqn }} gateway_ip_list={{ gateway_ip_list }}
   register: target
@@ -32,8 +28,8 @@
   with_items: "{{ client_connections }}"
   register: clients
 
-- name: Save the LIO config if changes are made from prior tasks
-  command: /usr/bin/targetcli saveconfig
-  when: (target.changed or images.changed or luns.changed or clients.changed)
+#- name: Save the LIO config if changes are made from prior tasks
+#  command: /usr/bin/targetcli saveconfig
+#  when: (target.changed or images.changed or luns.changed or clients.changed)
 
 

@@ -14,14 +14,26 @@
     register: conf_created
     when: mpathconf.stat.exists == False
 
-  - name: Read multipath.conf settings
-    command: mpathconf
+  - name: read multipath.conf settings
+    command: cat /etc/multipath.conf
     register: mpathout
+
+  - name: replace any existing kpartx setting
+    lineinfile: dest=/etc/multipath.conf  state='present' regexp="skip_kpartx no" line="\tskip_kpartx yes" backrefs=yes
+    when: mpathout.stdout.find("skip_kpartx") != -1
+
+  - name: insert new skip_kpartx setting
+    lineinfile: dest=/etc/multipath.conf  state='present' insertafter="^defaults" line="\tskip_kpartx yes"
+    when: mpathout.stdout.find("skip_kpartx") == -1
+
+  - name: Read multipath settings
+    command: mpathconf
+    register: mpath_settings
     when: mpathconf.stat.exists == True
 
   - name: ensure user friendly names is disabled
     command: mpathconf  --enable --with_multipathd y --user_friendly_names n --find_multipaths n
-    when: conf_created.changed == False and '"find_multipaths is enabled" in mpathout.stdout or "user_friendly_names is enabled" in mpathout.stdout'
+    when: conf_created.changed == False and ("find_multipaths is enabled" in mpath_settings.stdout or "user_friendly_names is enabled" in mpath_settings.stdout)
 
   - name: multipathd enabled and started
     service: name=multipathd state=started enabled=yes

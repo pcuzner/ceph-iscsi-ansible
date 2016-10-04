@@ -1,9 +1,0 @@
----
-  - name: Disabling rbdmap service from autostart at boot
-    file: path=/etc/systemd/system/multi-user.target.wants/rbdmap.service state=absent
-
-  - name: Removing dependency override for the target unit
-    file: path=/etc/systemd/system/target.service.d state=absent
-
-  - name: Refreshing systemd
-    command: systemctl daemon-reload

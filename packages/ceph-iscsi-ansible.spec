@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        0.6
+Version:        0.7
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of Ceph
 License:        ASL 2.0 
@@ -41,6 +41,11 @@ done
 %{_datarootdir}/ceph-ansible/ceph-iscsi-gw.yml
 
 %changelog
+* Wed Oct 05 2016 Paul Cuzner <pcuzner@redhat.com> - 0.7.1
+- removed service dependencies for rbdmap/target (replaced by rbd-target-gw form ceph-iscsi-config rpm)
+- removed target overrides files
+- updated playbook to add skip_partx yes to multipath.conf
+
 * Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6.1
 - changed the main function to have an ansible prefix to allow the code to know where it is invoked from
 - updated the purge module to support image names being prefixed by a pool i.e. pool/image
