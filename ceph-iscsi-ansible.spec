@@ -2,7 +2,7 @@ Name:           ceph-iscsi-ansible
 Version:        0.8
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
-License:        ASL 2.0 
+License:        ASL 2.0
 URL:            https://github.com/pcuzner/ceph-iscsi-ansible
 Source0:        https://github.com/pcuzner/ceph-iscsi-ansible/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -11,19 +11,22 @@ Requires: ansible1.9
 Requires: ceph-ansible >= 1.0.5
 
 %description
-Ansible playbooks that define nodes as iSCSI gateways (LIO). Once complete, the LIO instance on
-each node provides an ISCSI endpoint for clients to connect to. The playbook defines the front-end
-iSCSI environment (target -> tpgN -> NodeACLS/client), as well as the underlying rbd definition for 
-the rbd images to be exported over iSCSI.
+Ansible playbooks that define nodes as iSCSI gateways (LIO). Once complete, the
+LIO instance on each node provides an ISCSI endpoint for clients to connect to.
+The playbook defines the front-end iSCSI environment (target -> tpgN ->
+NodeACLS/client), as well as the underlying rbd definition for the rbd images
+to be exported over iSCSI.
 
-ceph-iscsi-gw.yml ... defines the LIO configuration(defined by group_vars/ceph-iscsi-gw.yml)
-purge_gateways.yml .. deletes the LIO configuration, and optionally rbd's from the environment
+ceph-iscsi-gw.yml ... defines the LIO configuration(defined by
+                      group_vars/ceph-iscsi-gw.yml)
+purge_gateways.yml .. deletes the LIO configuration, and optionally rbd's from
+                      the environment
 
-NB: The playbooks are dependent upon the ceph-iscsi-config package being installed/available to the
-hosts that will become iSCSI gateways.
+NB: The playbooks are dependent upon the ceph-iscsi-config package being
+installed/available to the hosts that will become iSCSI gateways.
 
 %prep
-%setup -q 
+%setup -q
 
 %build
 
@@ -46,17 +49,17 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
-* Thu Oct 06 2016 Paul Cuzner <pcuzner@redhat.com> - 0.8.1
+* Thu Oct 06 2016 Paul Cuzner <pcuzner@redhat.com> - 0.8-1
 - fix : purge_gateways.yml was missing
 - removed packages directory to clean up the source archive
 - spec file updates (dependencies)
 
-* Wed Oct 05 2016 Paul Cuzner <pcuzner@redhat.com> - 0.7.1
+* Wed Oct 05 2016 Paul Cuzner <pcuzner@redhat.com> - 0.7-1
 - removed service dependencies for rbdmap/target (replaced by rbd-target-gw form ceph-iscsi-config rpm)
 - removed target overrides files
 - updated playbook to add skip_partx yes to multipath.conf
 
-* Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6.1
+* Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6-1
 - changed the main function to have an ansible prefix to allow the code to know where it is invoked from
 - updated the purge module to support image names being prefixed by a pool i.e. pool/image
 
