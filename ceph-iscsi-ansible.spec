@@ -11,16 +11,19 @@ Requires: ansible1.9
 Requires: ceph-ansible >= 1.0.5
 
 %description
-Ansible playbooks that define nodes as iSCSI gateways (LIO). Once complete, the LIO instance on
-each node provides an ISCSI endpoint for clients to connect to. The playbook defines the front-end
-iSCSI environment (target -> tpgN -> NodeACLS/client), as well as the underlying rbd definition for
-the rbd images to be exported over iSCSI.
+Ansible playbooks that define nodes as iSCSI gateways (LIO). Once complete, the
+LIO instance on each node provides an ISCSI endpoint for clients to connect to.
+The playbook defines the front-end iSCSI environment (target -> tpgN ->
+NodeACLS/client), as well as the underlying rbd definition for the rbd images
+to be exported over iSCSI.
 
-ceph-iscsi-gw.yml ... defines the LIO configuration(defined by group_vars/ceph-iscsi-gw.yml)
-purge_gateways.yml .. deletes the LIO configuration, and optionally rbd's from the environment
+ceph-iscsi-gw.yml ... defines the LIO configuration(defined by
+                      group_vars/ceph-iscsi-gw.yml)
+purge_gateways.yml .. deletes the LIO configuration, and optionally rbd's from
+                      the environment
 
-NB: The playbooks are dependent upon the ceph-iscsi-config package being installed/available to the
-hosts that will become iSCSI gateways.
+NB: The playbooks are dependent upon the ceph-iscsi-config package being
+installed/available to the hosts that will become iSCSI gateways.
 
 %prep
 %setup -q
