@@ -7,7 +7,8 @@ gateway_iqn: "iqn.2003-01.com.redhat.iscsi-gw:ceph-igw"
 
 # gateway_ip_list provides a list of the IP Addrresses - one per gateway - that will be used
 # as an iscsi target portal ip
-gateway_ip_list: "192.168.122.101,192.168.122.102"
+#gateway_ip_list: "192.168.122.101,192.168.122.102"
+gateway_ip_list: "192.168.122.101,192.168.122.102,192.168.122.103"
 
 # rbd_devices defines the images that should be exported from the iscsi gateways
 rbd_devices:
@@ -22,5 +23,5 @@ rbd_devices:
 # client_connections defines the ACL's to restrict client access to specific LUNs
 client_connections:
   - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'rbd/ansible1,rbd/ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
-  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }
-#  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }
+#  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }
+  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }

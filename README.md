@@ -56,20 +56,15 @@ The solution has been tested on a collocated cluster where the osd/mons and gate
 
 ###Install the ansible playbooks
 1. installed the ceph-iscsi-ansible rpm from the packages directory on the node where you already have ceph-ansible deploy  
-2. update /etc/ansible/hosts to include a host group for the nodes that you want to become iscsi gateways  
-3. update the group_vars/ceph-iscsi-gw.yml file to define the environment you want
+2. update /etc/ansible/hosts to include a host group (ceph-iscsi-gw) for the nodes that you want to become iscsi gateways  
+3. make a copy of the group_vars/ceph-iscsi-gw.sample file called ceph-iscsi-gw, and update it to define the environment you want  
 4. run the playbook  
   ```> ansible-playbook ceph-iscsi-gw.yml```
   
 ##Purging the configuration
 As mentioned above, the project provides a purge-gateways.yml playbook which can remove the LIO configuration alone, or remove   
-both LIO and all associated rbd images that have been declared in the group_vars/ceph-iscsi-gw.yml file. The purge playbook will  
+both LIO and all associated rbd images that have been declared in the group_vars/ceph-iscsi-gw file. The purge playbook will  
 check for any active iscsi sessions, and abort if any are found.
     
-##Known Issues  
-
-1. Preferred path state on a gateway can be lost following either a gateway reboot, or a restart of the target service  
-  **Workaround**: Rerun the playbook to correct preferred paths following gateway or target service restart    
-  **Issue**: The *rtslib* 'save_to_file' call does **not** persist alua state information in the saveconfig.json file, so when the service restarts the alua preferred setting is lost    
-        
-2. the ceph cluster name is the default 'ceph', so the corresponding configuration file /etc/ceph/ceph.conf is assumed to be valid
+##Known Issues and Considerations  
+1. the ceph cluster name is the default 'ceph', so the corresponding configuration file /etc/ceph/ceph.conf is assumed to be valid
