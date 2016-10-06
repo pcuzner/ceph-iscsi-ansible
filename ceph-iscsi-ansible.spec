@@ -46,17 +46,17 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
-* Thu Oct 06 2016 Paul Cuzner <pcuzner@redhat.com> - 0.8.1
+* Thu Oct 06 2016 Paul Cuzner <pcuzner@redhat.com> - 0.8-1
 - fix : purge_gateways.yml was missing
 - removed packages directory to clean up the source archive
 - spec file updates (dependencies)
 
-* Wed Oct 05 2016 Paul Cuzner <pcuzner@redhat.com> - 0.7.1
+* Wed Oct 05 2016 Paul Cuzner <pcuzner@redhat.com> - 0.7-1
 - removed service dependencies for rbdmap/target (replaced by rbd-target-gw form ceph-iscsi-config rpm)
 - removed target overrides files
 - updated playbook to add skip_partx yes to multipath.conf
 
-* Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6.1
+* Mon Oct 03 2016 Paul Cuzner <pcuzner@redhat.com> - 0.6-1
 - changed the main function to have an ansible prefix to allow the code to know where it is invoked from
 - updated the purge module to support image names being prefixed by a pool i.e. pool/image
 
