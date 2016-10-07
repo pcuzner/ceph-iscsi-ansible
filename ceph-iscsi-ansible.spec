@@ -7,7 +7,7 @@ URL:            https://github.com/pcuzner/ceph-iscsi-ansible
 Source0:        https://github.com/pcuzner/ceph-iscsi-ansible/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-Requires: ansible1.9
+Requires: ansible >= 1.9
 Requires: ceph-ansible >= 1.0.5
 
 %description

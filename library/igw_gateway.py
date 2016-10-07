@@ -12,7 +12,7 @@ from ceph_iscsi_config.gateway import GWTarget
 from ceph_iscsi_config.utils import valid_ip
 
 
-def main():
+def ansible_main():
     # Configures the gateway on the host. All images defined are added to
     # the default tpg for later allocation to clients
     fields = {"gateway_iqn": {"required": True, "type": "str"},
@@ -61,4 +61,4 @@ if __name__ == '__main__':
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 
-    main()
+    ansible_main()

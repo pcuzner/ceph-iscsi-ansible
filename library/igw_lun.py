@@ -11,7 +11,7 @@ from ceph_iscsi_config.lun import LUN
 from ceph_iscsi_config.utils import valid_size
 
 
-def main():
+def ansible_main():
 
     # Define the fields needs to create/map rbd's the the host(s)
     # NB. features and state are reserved/unused
@@ -78,4 +78,4 @@ if __name__ == '__main__':
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 
-    main()
+    ansible_main()
