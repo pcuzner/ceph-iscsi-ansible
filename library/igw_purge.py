@@ -11,10 +11,10 @@ from logging.handlers import RotatingFileHandler
 from ansible.module_utils.basic import *
 
 from rtslib_fb import root
-from rtslib_fb.utils import RTSLibError
+from rtslib_fb.utils import RTSLibError, RTSLibNotInCFS
 
 from ceph_iscsi_config.common import Config
-
+from ceph_iscsi_config.alua import ALUATargetPortGroup
 
 class LIO(object):
     def __init__(self):
@@ -38,6 +38,20 @@ class LIO(object):
             for stg_object in self.lio_root.storage_objects:
 
                 if stg_object.name == image and stg_object.udev_path == dm_device:
+
+                    # this is temp until the rtslib lun/backstore deletes the
+                    # alua groups for the backstore/lun too.
+                    alua_dir = os.path.join(stg_object.path, "alua")
+
+                    for dirname in next(os.walk(alua_dir))[1]:
+                        if dirname != "default_tg_pt_gp":
+                            try:
+                                alua_tpg = ALUATargetPortGroup(stg_object, dirname)
+                                alua_tpg.delete()
+                            except (RTSLibError, RTSLibNotInCFS) as err:
+                                self.error = True
+                                self.error_msg = err
+                                # fall below. We might be able to clean up still
 
                     # this is an rbd device that's in the config object, so remove it
                     try:
