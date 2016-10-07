@@ -42,7 +42,7 @@ done
 %doc README
 %{_datarootdir}/ceph-ansible/ceph-iscsi-gw.yml
 %{_datarootdir}/ceph-ansible/purge_gateways.yml
-%{_datarootdir}/ceph-ansible/group_vars/ceph-iscsi-gw.yml
+%{_datarootdir}/ceph-ansible/group_vars/ceph-iscsi-gw.sample
 %{_datarootdir}/ceph-ansible/roles/ceph-iscsi-gw
 %{_datarootdir}/ceph-ansible/library/igw*
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyo
