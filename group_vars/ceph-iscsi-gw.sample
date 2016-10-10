@@ -1,27 +1,64 @@
-
 # Variables for the ceph gateways
-# requires a ceph group entry either in /etc/ansible/hosts or
-# passed as an inventory to ansible-playbook (-i)
+#
+# Pre-reqs
+# 1. Ensure there is an entry in /etc/ansible/hosts for the ceph-iscsi-gw group
+#    listing all hosts that will become iscsi gateways
 
+
+# The seed_monitor must be set to the hostname or IP of one of the online ceph mons.
+# It is used by the playbook to copy the admin keyring over to the intended iscsi
+# gateway nodes. The gateway nodes use the python rados bindings, which need a local
+# keyring for authentication to the cluster
+seed_monitor: mon
+
+
+# perform_system_checks triggers checks for pre-requisite rpms and also
+# updates multipath.conf appropriately for rbd usage. Therefore it must
+# be set to 'yes' for at least the first run to ensure the environment
+# is configured correctly. However, for subsequent runs it can be set
+# to 'no'.
+#
+# NB. if you comment this out, the checks will run by default - you must
+#     specify 'no' if you want to skip these checks
+perform_system_checks: 'yes'
+
+
+# Specify the iqn for ALL gateways. This iqn is shared across the gateways, so an iscsi
+# client sees the gateway group as a single storage subsystem.
 gateway_iqn: "iqn.2003-01.com.redhat.iscsi-gw:ceph-igw"
 
+
 # gateway_ip_list provides a list of the IP Addrresses - one per gateway - that will be used
-# as an iscsi target portal ip
-#gateway_ip_list: "192.168.122.101,192.168.122.102"
+# as an iscsi target portal ip. The list must be comma separated - and the order determines
+# the sequence of TPG's within the iscsi target across each gateway. Once set, additional
+# gateways can be added, but the order must *not* be changed.
 gateway_ip_list: "192.168.122.101,192.168.122.102,192.168.122.103"
 
-# rbd_devices defines the images that should be exported from the iscsi gateways
+
+# rbd_devices defines the images that should be created and exported from the iscsi gateways.
+# If the rbd does not exist, it will be created for you. In addition you may increase the
+# size of rbd's by changing the size parameter and rerunning the playbook. A size value lower
+# than the current size of the rbd is ignored.
+#
+# the 'host' parameter defines which of the gateway nodes should handle the physical
+# allocation or expansion of the rbd.
+#
+# NB. this definition can be commented out to bypass LUN management
 rbd_devices:
   - { pool: 'rbd', image: 'ansible1', size: '30G', host: 'ceph-1'}
   - { pool: 'rbd', image: 'ansible2', size: '15G', host: 'ceph-1'}
   - { pool: 'rbd', image: 'ansible3', size: '30G', host: 'ceph-1'}
   - { pool: 'rbd', image: 'ansible4', size: '50G', host: 'ceph-1'}
-#  - { pool: 'rbd', image: 'ansible5', size: '50G', host: 'ceph-1'}
-#  - { pool: 'rbd', image: 'ansible6', size: '5G', host: 'ceph-2'}
 
 
-# client_connections defines the ACL's to restrict client access to specific LUNs
+# client_connections defines the client ACL's to restrict client access to specific LUNs
+# The settings are as follows;
+# - image_list is a comma separated list of rbd images of the form <pool name>/<rbd_image_name>
+# - credentials supplies the user and password the client will use for authentication of the
+#   form <user>/<password>
+# - status shows the intended state of this client definition - 'present' or 'absent'
+#
+# NB. this definition can be commented out to skip client (nodeACL) management
 client_connections:
   - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'rbd/ansible1,rbd/ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
-#  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }
-  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'present' }
+  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }

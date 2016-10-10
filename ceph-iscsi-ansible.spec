@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        0.8
+Version:        1.0
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
 License:        ASL 2.0
@@ -49,6 +49,14 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
+* Mon Oct 10 2016 Paul Cuzner <pcuzner@redhat.com> - 1.0-1
+- fix : allow client_connections and rbd_devices to be be empty to skip those steps
+- add usage guidelines to the group_vars/ceph-iscsi-gw.sample file
+- added variable to allow pre-req checks to be bypassed during a run
+- updated list of rpm pre-req that ansible checks for
+- add synchronize task to the playbook to copy admin keyring to gateway node(s)
+- updated igw_purge module to allow for the deletion of the alua port groups
+
 * Thu Oct 06 2016 Paul Cuzner <pcuzner@redhat.com> - 0.8-1
 - fix : purge_gateways.yml was missing
 - removed packages directory to clean up the source archive

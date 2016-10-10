@@ -8,7 +8,15 @@
 
 # handle the environment pre-req's for EL7, and package dependencies
 - include: pkgs_prereqs_el7.yml
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and ( perform_system_checks is undefined or perform_system_checks == "yes" )
+
+# Each gateway needs the admin keyring for python-rados based access to the ceph cluster
+- name: sync the admin keyring from the seed monitor to each gateway node
+  synchronize:
+    mode: push
+    src: /etc/ceph/ceph.client.admin.keyring
+    dest: /etc/ceph/ceph.client.admin.keyring
+  delegate_to: "{{ seed_monitor }}"
 
 - name: igw_gateway (tgt) | Configure iSCSI Target (gateway)
   igw_gateway: mode="target" gateway_iqn={{ gateway_iqn }} gateway_ip_list={{ gateway_ip_list }}
@@ -16,7 +24,7 @@
 
 - name: igw_lun | Configure LUNs (create/map rbds and add to LIO)
   igw_lun: pool={{ item.pool }} image={{item.image}} size={{ item.size }} host={{ item.host }}
-  with_items: "{{ rbd_devices }}"
+  with_items: "{{ rbd_devices|default([]) }}"
   register: images
 
 - name: igw_gateway (map) | Map LUNs to the iSCSI target
@@ -25,7 +33,7 @@
 
 - name: igw_client | Configure client connectivity
   igw_client: client_iqn={{ item.client }} image_list={{item.image_list}} auth='chap' credentials={{ item.credentials }} state={{ item.status }}
-  with_items: "{{ client_connections }}"
+  with_items: "{{ client_connections|default([]) }}"
   register: clients
 
 #- name: Save the LIO config if changes are made from prior tasks

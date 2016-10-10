@@ -2,6 +2,6 @@ This package installs the playbooks/tasks necessary to configure LIO gateways th
 
 The playbooks use custom modules that are just wrappers calling python modules installed on the gateways nodes. These
 python modules handle the configuration interaction for;
-- the gateway
+- the iscsi target definition (target iqn, target portal groups and portal IP's)
 - LUN's including RBD create and resize
 - client definition
