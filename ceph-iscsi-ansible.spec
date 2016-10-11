@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        1.0
+Version:        1.1
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
 License:        ASL 2.0
@@ -49,6 +49,9 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
+* Wed Oct 12 2016 Paul Cuzner <pcuzner@redhat.com> - 1.1-1
+- updated playbook to modify lvm.conf to exclude the dm devices created for mapped rbds
+
 * Mon Oct 10 2016 Paul Cuzner <pcuzner@redhat.com> - 1.0-1
 - fix : allow client_connections and rbd_devices to be be empty to skip those steps
 - add usage guidelines to the group_vars/ceph-iscsi-gw.sample file

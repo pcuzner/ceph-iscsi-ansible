@@ -2,7 +2,7 @@
   # These are the dependencies for the gateway. The Red Hat solution uses dm-multipath as part of a
   # strategy to eliminate stale I/O when data paths are lost. Targetcli provides an interface to the
   # LIO configuration, and rsync is needed to copy ceph keyring from the monitor node to the gateways.
-  - name: Check required rpms are installed at latest versions
+  - name: Check required rpms are installed
     yum: name={{ item.rpm }} state=latest
     with_items:
       - rpm: device-mapper-multipath
@@ -43,3 +43,17 @@
 
   - name: multipathd enabled and started
     service: name=multipathd state=started enabled=yes
+
+  - name: look at lvm.conf
+    shell: cat /etc/lvm/lvm.conf
+    register: lvm_conf
+    changed_when: false
+
+  - name: add exclusion for rbd dm devices to lvm.conf if it's not already there
+    lineinfile: dest=/etc/lvm/lvm.conf  state='present' insertafter="# global_filter =" line='\tglobal_filter = [ "r|^/dev/mapper/[0-255]-.*|" ]'
+    when: '"/dev/mapper/[0-255]-" not in lvm_conf.stdout'
+    register: lvm_conf_updated
+
+  - name: refresh lvm following update to lvm.conf
+    shell: vgscan && lvmdiskscan
+    when: lvm_conf_updated.changed
