@@ -8,7 +8,11 @@
 # The seed_monitor must be set to the hostname or IP of one of the online ceph mons.
 # It is used by the playbook to copy the admin keyring over to the intended iscsi
 # gateway nodes. The gateway nodes use the python rados bindings, which need a local
-# keyring for authentication to the cluster
+# keyring for authentication to the cluster.
+#
+# This 'seed' monitor *must* have passwordless ssh setup to the gateway nodes, to
+# allow the transfer of the key file. If this is not done the task
+# "sync the admin keyring" will hang/timeout.
 seed_monitor: mon
 
 
