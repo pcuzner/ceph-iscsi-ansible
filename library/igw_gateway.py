@@ -11,7 +11,9 @@ from ansible.module_utils.basic import *
 from ceph_iscsi_config.gateway import GWTarget
 from ceph_iscsi_config.utils import valid_ip
 
-
+# the main function is called ansible_main to allow the call stack
+# to be checked to determine whether the call to the ceph_iscsi_config
+# modules is from ansible or not
 def ansible_main():
     # Configures the gateway on the host. All images defined are added to
     # the default tpg for later allocation to clients
@@ -37,6 +39,9 @@ def ansible_main():
     logger.info("START - GATEWAY configuration started in mode {}".format(mode))
 
     gateway = GWTarget(logger, gateway_iqn, gateway_ip_list)
+    if gateway.error:
+        logger.critical("(ansible_main) Gateway init failed - {}".format(gateway.error_msg))
+        module.fail_json(msg="iSCSI gateway initialisation failed ({})".format(gateway.error_msg))
 
     gateway.manage(mode)
 
