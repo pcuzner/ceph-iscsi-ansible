@@ -44,7 +44,15 @@
   - name: multipathd enabled and started
     service: name=multipathd state=started enabled=yes
 
-  - name: look at lvm.conf
+  - name: check the status of the target.service override
+    stat: path=/etc/systemd/system/target.service
+    register: target
+
+  - name: Mask the target service - preventing manual start
+    shell: systemctl disable target.service && systemctl mask target.service
+    when: target.stat.exists == False or (target.stat.exists and target.stat.islnk == False)
+
+  - name: reading lvm.conf
     shell: cat /etc/lvm/lvm.conf
     register: lvm_conf
     changed_when: false
