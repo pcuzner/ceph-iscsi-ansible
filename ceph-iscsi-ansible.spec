@@ -49,7 +49,7 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
-* Wed Oct 12 2016 Paul Cuzner <pcuzner@redhat.com> - 1.2-1
+* Sat Oct 15 2016 Paul Cuzner <pcuzner@redhat.com> - 1.2-1
 - documented the passwordless ssh requirement for the seed_monitor node
 - fix BZ 1384505 mask the target service preventing manual start/stop
 - fix BZ 1384858 when the admin updates ansible hosts but not the gateway_ip_list variable
