@@ -10,7 +10,9 @@ from ansible.module_utils.basic import *
 from ceph_iscsi_config.lun import LUN
 from ceph_iscsi_config.utils import valid_size
 
-
+# the main function is called ansible_main to allow the call stack
+# to be checked to determine whether the call to the ceph_iscsi_config
+# modules is from ansible or not
 def ansible_main():
 
     # Define the fields needs to create/map rbd's the the host(s)

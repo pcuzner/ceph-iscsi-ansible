@@ -9,7 +9,9 @@ from ansible.module_utils.basic import *
 
 from ceph_iscsi_config.client import GWClient
 
-
+# the main function is called ansible_main to allow the call stack
+# to be checked to determine whether the call to the ceph_iscsi_config
+# modules is from ansible or not
 def ansible_main():
 
     fields = {
