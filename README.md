@@ -55,7 +55,7 @@ The solution has been tested on a collocated cluster where the osd/mons and gate
  of this rpm (https://github.com/pcuzner/ceph-iscsi-config)
 
 ###Install the ansible playbooks
-1. installed the ceph-iscsi-ansible rpm from the packages directory on the node where you already have ceph-ansible deploy  
+1. installed the ceph-iscsi-ansible rpm from the packages directory on the node where you already have ceph-ansible installed.
 2. update /etc/ansible/hosts to include a host group (ceph-iscsi-gw) for the nodes that you want to become iscsi gateways  
 3. make a copy of the group_vars/ceph-iscsi-gw.sample file called ceph-iscsi-gw, and update it to define the environment you want  
 4. run the playbook  
