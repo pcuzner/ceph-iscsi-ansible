@@ -8,6 +8,7 @@ from logging.handlers import RotatingFileHandler
 from ansible.module_utils.basic import *
 
 from ceph_iscsi_config.client import GWClient
+import ceph_iscsi_config.settings as settings
 
 # the main function is called ansible_main to allow the call stack
 # to be checked to determine whether the call to the ceph_iscsi_config
@@ -76,5 +77,9 @@ if __name__ == '__main__':
     log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
+
+    # initialise global variables used by all called modules
+    # e.g. ceph conffile, keyring etc
+    settings.init()
 
     ansible_main()

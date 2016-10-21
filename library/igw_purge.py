@@ -13,6 +13,7 @@ from ansible.module_utils.basic import *
 from rtslib_fb import root
 from rtslib_fb.utils import RTSLibError, RTSLibNotInCFS
 
+import ceph_iscsi_config.settings as settings
 from ceph_iscsi_config.common import Config
 from ceph_iscsi_config.alua import ALUATargetPortGroup
 
@@ -257,5 +258,7 @@ if __name__ == '__main__':
     log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
+
+    settings.init()
 
     ansible_main()
