@@ -8,15 +8,13 @@
 
 # handle the environment pre-req's for EL7, and package dependencies
 - include: pkgs_prereqs_el7.yml
-  when: ansible_os_family == "RedHat" and ( perform_system_checks is undefined or perform_system_checks == "yes" )
+  when: ansible_os_family == "RedHat" and ( perform_system_checks is undefined or perform_system_checks )
 
-# Each gateway needs the admin keyring for python-rados based access to the ceph cluster
-- name: sync the admin keyring from the seed monitor to each gateway node
-  synchronize:
-    mode: push
-    src: /etc/ceph/ceph.client.admin.keyring
-    dest: /etc/ceph/ceph.client.admin.keyring
-  delegate_to: "{{ seed_monitor }}"
+# this task deploys the default ceph connection settings needed by the config
+# management modules. It only needs to run once, so can be skipped on subsequent
+# configuration updates by specifing deploy_settings: no in the group vars file
+- include: deploy_gw_conf.yml
+  when: ansible_os_family == "RedHat" and ( deploy_settings is undefined or deploy_settings )
 
 - name: igw_gateway (tgt) | Configure iSCSI Target (gateway)
   igw_gateway: mode="target" gateway_iqn={{ gateway_iqn }} gateway_ip_list={{ gateway_ip_list }}
@@ -35,9 +33,4 @@
   igw_client: client_iqn={{ item.client }} image_list={{item.image_list}} auth='chap' credentials={{ item.credentials }} state={{ item.status }}
   with_items: "{{ client_connections|default([]) }}"
   register: clients
-
-#- name: Save the LIO config if changes are made from prior tasks
-#  command: /usr/bin/targetcli saveconfig
-#  when: (target.changed or images.changed or luns.changed or clients.changed)
-
 
