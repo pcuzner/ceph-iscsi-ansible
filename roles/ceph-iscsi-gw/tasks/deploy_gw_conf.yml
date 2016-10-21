@@ -1,0 +1,25 @@
+---
+
+  # This deployment runs after a ceph-ansible run, so we can use the
+  # one of the ceph mon's to seed the configuration of the gateways
+  - name: Copy the seed monitor's ceph config files to the ansible machine
+    run_once: True
+    local_action: command sftp -r "{{ seed_monitor }}":/etc/ceph /root/ceph-iscsi-conf
+
+  - name: check /etc/ceph current contents
+    command: ls -1 /etc/ceph
+    register: etc_ceph
+
+  - name: copy <cluster>.conf if it's not there
+    copy: src=/root/ceph-iscsi-conf/{{ cluster_name }}.conf dest=/etc/ceph/.
+    when: "'{{ cluster_name }}.conf\n' not in etc_ceph.stdout"
+
+  - name: copy keyring if it's not there
+    copy: src=/root/ceph-iscsi-conf/{{ gateway_keyring }} dest=/etc/ceph/.
+    when: "'{{ gateway_keyring }}\n' not in etc_ceph.stdout"
+
+  # With the configuration files in place define the .conf for the
+  # configuration modules to use
+  - name: deploy gateway settings, used by the ceph_iscsi_config modules
+    template: src=../templates/iscsi-gateway.conf.j2 dest=/etc/ceph/iscsi-gateway.conf
+

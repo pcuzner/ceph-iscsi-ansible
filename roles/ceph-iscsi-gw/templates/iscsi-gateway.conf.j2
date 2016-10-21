@@ -1,0 +1,9 @@
+# This is seed configuration used by the ceph_iscsi_config modules
+# when handling configuration tasks for iscsi gateway(s)
+#
+# {{ ansible_managed }}
+
+[config]
+cluster_name = {{ cluster_name | default ('ceph') }}
+gateway_keyring = {{ gateway_keyring | default ('/etc/ceph/ceph.client.admin.keyring') }}
+
