@@ -15,16 +15,26 @@
 # "sync the admin keyring" will hang/timeout.
 seed_monitor: mon
 
+# The following settings are needed to provide defaults for the way
+# in which the ceph cluster is accessed over the rados api. Once a run has been
+# performed, you may switch the deploy_settings variable to false.
+#
+# NB if you comment out the deploy_settings variable, the task will execute
+#    by default
+cluster_name: ceph
+gateway_keyring: ceph.client.admin.keyring
+deploy_settings: true
+
 
 # perform_system_checks triggers checks for pre-requisite rpms and also
 # updates multipath.conf appropriately for rbd usage. Therefore it must
 # be set to 'yes' for at least the first run to ensure the environment
 # is configured correctly. However, for subsequent runs it can be set
-# to 'no'.
+# to false.
 #
 # NB. if you comment this out, the checks will run by default - you must
-#     specify 'no' if you want to skip these checks
-perform_system_checks: 'yes'
+#     specify false if you want to skip these checks
+perform_system_checks: true
 
 
 # Specify the iqn for ALL gateways. This iqn is shared across the gateways, so an iscsi
