@@ -1,14 +1,13 @@
 ---
   # These are the dependencies for the gateway. The Red Hat solution uses dm-multipath as part of a
   # strategy to eliminate stale I/O when data paths are lost. Targetcli provides an interface to the
-  # LIO configuration, and rsync is needed to copy ceph keyring from the monitor node to the gateways.
+  # LIO configuration to check what's been done!
   - name: Check required rpms are installed
     yum: name={{ item.rpm }} state=latest
     with_items:
       - rpm: device-mapper-multipath
       - rpm: ceph-iscsi-config
       - rpm: targetcli
-      - rpm: rsync
       - rpm: ceph-common
 
   - name: check multipath.conf file state
