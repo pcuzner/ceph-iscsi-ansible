@@ -18,13 +18,7 @@ def ansible_main():
     fields = {
         "client_iqn": {"required": True, "type": "str"},
         "image_list": {"required": True, "type": "str"},
-        "credentials": {"required": False, "type": "str", "default": ''},
-        "auth": {
-            "required": False,
-            "default": '',
-            "choices": ['', 'chap'],
-            "type": "str"
-        },
+        "chap": {"required": False, "type": "str", "default": ''},
         "state": {
             "required": True,
             "choices": ['present', 'absent'],
@@ -36,23 +30,27 @@ def ansible_main():
                            supports_check_mode=False)
 
     client_iqn = module.params['client_iqn']
-    image_list = module.params['image_list'].split(',')
-    credentials = module.params['credentials']
-    auth_type = module.params['auth']
+
+    if module.params['image_list']:
+        image_list = module.params['image_list'].split(',')
+    else:
+        image_list = []
+
+    chap = module.params['chap']
     desired_state = module.params['state']
 
-    auth_methods = ['chap']
-
-    if auth_type in auth_methods and not credentials:
-        module.fail_json(msg="Unable to configure - auth method of '{}' requested, without"
-                             " credentials for {}".format(auth_type, client_iqn))
+    # auth_methods = ['chap']
+    #
+    # if auth_type in auth_methods and not credentials:
+    #     module.fail_json(msg="Unable to configure - auth method of '{}' requested, without"
+    #                          " credentials for {}".format(auth_type, client_iqn))
 
     logger.info("START - Client configuration started : {}".format(client_iqn))
 
     # The client is defined using the GWClient class. This class handles client attribute updates,
     # rados configuration object updates and LIO settings. Since the logic is external to this
     # custom module, clients can be created/deleted by other methods in the same manner.
-    client = GWClient(logger, client_iqn, image_list, auth_type, credentials)
+    client = GWClient(logger, client_iqn, image_list, chap)
 
     client.manage(desired_state)
 
