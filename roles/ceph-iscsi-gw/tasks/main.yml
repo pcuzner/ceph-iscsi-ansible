@@ -30,7 +30,7 @@
   register: luns
 
 - name: igw_client | Configure client connectivity
-  igw_client: client_iqn={{ item.client }} image_list={{item.image_list}} auth='chap' credentials={{ item.credentials }} state={{ item.status }}
+  igw_client: client_iqn={{ item.client }} image_list={{item.image_list}} chap={{ item.chap }} state={{ item.status }}
   with_items: "{{ client_connections|default([]) }}"
   register: clients
 
