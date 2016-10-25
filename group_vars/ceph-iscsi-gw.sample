@@ -67,12 +67,12 @@ rbd_devices:
 
 # client_connections defines the client ACL's to restrict client access to specific LUNs
 # The settings are as follows;
-# - image_list is a comma separated list of rbd images of the form <pool name>/<rbd_image_name>
-# - credentials supplies the user and password the client will use for authentication of the
+# - image_list is a comma separated list of rbd images of the form <pool name>.<rbd_image_name>
+# - chap supplies the user and password the client will use for authentication of the
 #   form <user>/<password>
 # - status shows the intended state of this client definition - 'present' or 'absent'
 #
 # NB. this definition can be commented out to skip client (nodeACL) management
 client_connections:
-  - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'rbd/ansible1,rbd/ansible2', credentials: 'rh7-iscsi-client/redhat', status: 'present' }
-  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd/ansible4', credentials: 'w2k12r2/microsoft_w2k12', status: 'absent' }
+  - { client: 'iqn.1994-05.com.redhat:rh7-iscsi-client', image_list: 'rbd.ansible1,rbd.ansible2', chap: 'rh7-iscsi-client/redhat', status: 'present' }
+  - { client: 'iqn.1991-05.com.microsoft:w2k12r2', image_list: 'rbd.ansible4', chap: 'w2k12r2/microsoft_w2k12', status: 'absent' }
