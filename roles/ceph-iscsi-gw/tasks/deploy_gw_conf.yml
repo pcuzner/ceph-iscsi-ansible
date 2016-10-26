@@ -4,7 +4,7 @@
   # one of the ceph mon's to seed the configuration of the gateways
   - name: Copy the seed monitor's ceph config files to the ansible machine
     run_once: True
-    local_action: command sftp -r "{{ seed_monitor }}":/etc/ceph /root/ceph-iscsi-conf
+    local_action: command sftp -r "{{ seed_monitor }}":/etc/ceph/* /root/ceph-iscsi-conf
 
   - name: check /etc/ceph current contents
     command: ls -1 /etc/ceph
