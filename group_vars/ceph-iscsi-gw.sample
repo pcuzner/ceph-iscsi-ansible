@@ -55,14 +55,16 @@ gateway_ip_list: "192.168.122.101,192.168.122.102,192.168.122.103"
 # than the current size of the rbd is ignored.
 #
 # the 'host' parameter defines which of the gateway nodes should handle the physical
-# allocation or expansion of the rbd.
+# allocation/expansion or removal of the rbd
+# to remove an image, simply use a state of 'absent'. This will first check the rbd is not allocated
+# to any client, and the remove it from LIO and then delete the rbd image
 #
-# NB. this definition can be commented out to bypass LUN management
+# NB. this variable definition can be commented out to bypass LUN management
 rbd_devices:
-  - { pool: 'rbd', image: 'ansible1', size: '30G', host: 'ceph-1'}
-  - { pool: 'rbd', image: 'ansible2', size: '15G', host: 'ceph-1'}
-  - { pool: 'rbd', image: 'ansible3', size: '30G', host: 'ceph-1'}
-  - { pool: 'rbd', image: 'ansible4', size: '50G', host: 'ceph-1'}
+  - { pool: 'rbd', image: 'ansible1', size: '30G', host: 'ceph-1', state: 'present' }
+  - { pool: 'rbd', image: 'ansible2', size: '15G', host: 'ceph-1', state: 'present' }
+  - { pool: 'rbd', image: 'ansible3', size: '30G', host: 'ceph-1', state: 'present' }
+  - { pool: 'rbd', image: 'ansible4', size: '50G', host: 'ceph-1', state: 'present' }
 
 
 # client_connections defines the client ACL's to restrict client access to specific LUNs

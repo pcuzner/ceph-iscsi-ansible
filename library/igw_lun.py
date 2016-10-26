@@ -25,6 +25,7 @@ def ansible_main():
         "host": {"required": True, "type": "str"},
         "features": {"required": False, "type": "str"},
         "state": {
+            "required": False,
             "default": "present",
             "choices": ['present', 'absent'],
             "type": "str"
@@ -39,6 +40,7 @@ def ansible_main():
     image = module.params['image']
     size = module.params['size']
     allocating_host = module.params['host']
+    desired_state = module.params['state']
 
     ################################################
     # Validate the parameters passed from Ansible  #
@@ -57,7 +59,7 @@ def ansible_main():
     logger.info("START - LUN configuration started for {}/{}".format(pool, image))
 
     # attempt to create/allocate the LUN for LIO
-    lun.allocate()
+    lun.manage(desired_state)
     if lun.error:
         module.fail_json(msg=lun.error_msg)
 

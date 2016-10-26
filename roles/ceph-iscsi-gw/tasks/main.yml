@@ -21,7 +21,7 @@
   register: target
 
 - name: igw_lun | Configure LUNs (create/map rbds and add to LIO)
-  igw_lun: pool={{ item.pool }} image={{item.image}} size={{ item.size }} host={{ item.host }}
+  igw_lun: pool={{ item.pool }} image={{item.image}} size={{ item.size }} host={{ item.host }} state={{ item.state }}
   with_items: "{{ rbd_devices|default([]) }}"
   register: images
 
