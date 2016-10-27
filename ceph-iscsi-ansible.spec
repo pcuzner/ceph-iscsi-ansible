@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        1.3
+Version:        1.4
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
 License:        ASL 2.0
@@ -49,6 +49,15 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
+* Thu Oct 27 2016 Paul Cuzner <pcuzner@redhat.com> - 1.4-1
+- clients can now be added without images or chap defined using null strings
+- changed parameters for client definition to position for other auth mechanisms
+- adapt purge module to use revised disk naming scheme within config object
+- updated group_vars sample to reflect name changes
+- added state= setting to LUN definitions (enabling disks to be add/removed)
+- fix syntax issue during ceph.conf seed process
+- documentation added to the Ansible modules
+
 * Fri Oct 21 2016 Paul Cuzner <pcuzner@redhat.com> - 1.3-1
 - removed rsync rpm dependency (BZ 1386090)
 - ceph.conf pulled from seed monitor, then pushed to gateways using copy task
