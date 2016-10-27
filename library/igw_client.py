@@ -2,6 +2,56 @@
 
 __author__ = 'pcuzner@redhat.com'
 
+DOCUMENTATION = """
+---
+module: igw_client
+short_description: Manage iscsi gateway client definitions
+description:
+  - This module calls the 'client' configuration management module installed
+    on the iscsi gateway node to handle the definition of iscsi clients on the
+    gateway(s). This definition will setup iscsi authentication (e.g. chap), and
+    mask the required rbd images to the client.
+
+    The 'client' configuration module is provided by ceph-iscsi-config
+    rpm which is installed on the gateway nodes.
+
+    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
+    on the target machine(s).
+
+option:
+  client_iqn:
+    description:
+      - iqn of the client machine which should be connected or removed from the
+        iscsi gateway environment
+    required: true
+
+  image_list:
+    description:
+      - comma separated string providing the rbd images that this
+        client definition should have. The rbd images provided must use the
+        following format <pool_name>.<rbd_image_name>
+        e.g. rbd.disk1,rbd.disk2
+    required: true
+
+  chap:
+    description:
+      - chap credentials for the client to authenticate to the gateways
+        to gain access to the exported rbds (LUNs). The credentials is a string
+        value of the form 'username/password'. The iscsi client must then use
+        these settings to gain access to any LUN resources.
+    required: true
+
+  state:
+    description:
+      - desired state for this client - absent or present
+    required: true
+
+requirements: ['ceph-iscsi-config']
+
+author:
+  - 'Paul Cuzner'
+
+"""
 
 import logging
 from logging.handlers import RotatingFileHandler
@@ -18,7 +68,7 @@ def ansible_main():
     fields = {
         "client_iqn": {"required": True, "type": "str"},
         "image_list": {"required": True, "type": "str"},
-        "chap": {"required": False, "type": "str", "default": ''},
+        "chap": {"required": True, "type": "str"},
         "state": {
             "required": True,
             "choices": ['present', 'absent'],

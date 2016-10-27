@@ -2,6 +2,74 @@
 
 __author__ = 'pcuzner@redhat.com'
 
+DOCUMENTATION = """
+---
+module: igw_lun
+short_description: Manage ceph rbd images to present as iscsi LUNs to clients
+description:
+  - This module calls the 'lun' configuration management module installed
+    on the iscsi gateway node(s). The lun module handles the creation and resize
+    of rbd images, and then maps these rbd devices to the gateway node(s) to be
+    exposed through the kernel's LIO target.
+
+    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
+    on the target machine(s).
+
+option:
+  pool:
+    description:
+      - The ceph pool where the image should exist or be created in.
+
+        NOTE - The pool *must* exist prior to the Ansible run.
+
+    required: true
+
+  image:
+    description:
+      - this is the rbd image name to create/resize - if the rbd does not exist it
+        is created for you with the settings optimised for exporting over iscsi.
+    required: true
+
+  size:
+    description:
+      - The size of the rbd image to create/resize. The size is numeric suffixed by
+        G or T (GB or TB). Increasing the size of a LUN is supported, but if a size
+        is provided that is smaller that the current size, the request is simply ignored.
+
+        e.g. 100G
+    required: true
+
+  host:
+    description:
+      - the host variable defines the name of the gateway node that will be
+        the allocation host for this rbd image. RBD creation and resize can
+        only be performed by one gateway, the other gateways in the
+        configuration will wait for the operation to complete.
+    required: true
+
+  features:
+    description:
+      - placeholder to potentially allow different rbd features to be set at
+        allocation time by Ansible. NOT CURRENTLY USED
+    required: false
+
+  state:
+    description:
+      - desired state for this LUN - absent or present. For a state='absent'
+      request, the lun module will verify that the rbd image is not allocated to
+      a client. As long as the rbd image is not in use, the LUN definition will be
+      removed from LIO, unmapped from all gateways AND DELETED.
+
+      USE WITH CARE!
+    required: true
+
+requirements: ['ceph-iscsi-config']
+
+author:
+  - 'Paul Cuzner'
+
+"""
+
 import logging
 from logging.handlers import RotatingFileHandler
 

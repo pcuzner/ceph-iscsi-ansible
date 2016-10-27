@@ -2,6 +2,37 @@
 
 __author__ = 'pcuzner@redhat.com'
 
+DOCUMENTATION = """
+---
+module: igw_purge
+short_description: Provide a purge capability to remove an iSCSI gateway environment
+description:
+  - This module handles the removal of a gateway configuration from a ceph environment.
+    The playbook that calls this module prompts the user for the type of purge to perform.
+    The purge options are;
+    all ... purge all LIO configuration *and* delete all defined rbd images
+    lio ... purge only the LIO configuration (rbd's are left intact)
+
+    USE WITH CAUTION
+
+    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
+    on the target machine(s).
+
+option:
+  mode:
+    description:
+      - the mode defines the type of purge requested
+        gateway ... remove the LIO configuration only
+        disks   ... remove the rbd disks defined to the gateway
+    required: true
+
+requirements: ['ceph-iscsi-config', 'python-rtslib']
+
+author:
+  - 'Paul Cuzner'
+
+"""
+
 import logging
 import socket
 import subprocess
@@ -16,6 +47,7 @@ from rtslib_fb.utils import RTSLibError, RTSLibNotInCFS
 import ceph_iscsi_config.settings as settings
 from ceph_iscsi_config.common import Config
 from ceph_iscsi_config.alua import ALUATargetPortGroup
+
 
 class LIO(object):
     def __init__(self):

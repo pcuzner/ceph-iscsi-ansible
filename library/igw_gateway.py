@@ -2,6 +2,59 @@
 __author__ = 'pcuzner@redhat.com'
 
 
+DOCUMENTATION = """
+---
+module: igw_gateway
+short_description: Manage the iscsi gateway definition
+description:
+  - This module calls the 'gateway' configuration management module installed
+    on the iscsi gateway node(s) to handle the definition of iscsi gateways.
+    The module will configure;
+    * the iscsi target and target portal group (TPG)
+    * rbd maps to the gateway and registration of those rbds as LUNs to the
+      kernels LIO subsystem
+
+    The actual configuration modules are provided by ceph-iscsi-config rpm which
+    is installed on the gateway nodes.
+
+    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
+    on the target machine(s).
+
+option:
+  gateway_iqn:
+    description:
+      - iqn that all gateway nodes will use to present a common system image
+        name to iscsi clients
+    required: true
+
+  gateway_ip_list:
+    description:
+      - comma separated string providing the IP addresses that will be used
+        as iSCSI portal IPs to accept iscsi client connections. Each IP address
+        should equate to an IP on a gateway node - typically dedicated to iscsi
+        traffic. The order of the IP addresses determines the TPG sequence within
+        the target definition - so once defined, new gateways can be added but
+        *must* be added to the end of this list to preserve the tpg sequence
+
+        e.g. 192.168.122.101,192.168.122.103
+    required: true
+
+  mode:
+    description:
+      - mode in which to run the gateway module. Two modes are supported
+        target ... define the iscsi target iqn, tpg's and portals
+        map ...... map luns to the tpg's, and also define the ALUA path setting
+                   for each LUN (activeOptimized/activenonoptimized)
+    required: true
+
+
+requirements: ['ceph-iscsi-config']
+
+author:
+  - 'Paul Cuzner'
+
+"""
+
 import os
 import logging
 
@@ -21,7 +74,6 @@ def ansible_main():
     # Configures the gateway on the host. All images defined are added to
     # the default tpg for later allocation to clients
     fields = {"gateway_iqn": {"required": True, "type": "str"},
-              # "iscsi_network": {"required": True, "type": "str"},
               "gateway_ip_list": {"required": True},    # "type": "list"},
               "mode": {
                   "required": True,
