@@ -89,21 +89,16 @@ def ansible_main():
     chap = module.params['chap']
     desired_state = module.params['state']
 
-    # auth_methods = ['chap']
-    #
-    # if auth_type in auth_methods and not credentials:
-    #     module.fail_json(msg="Unable to configure - auth method of '{}' requested, without"
-    #                          " credentials for {}".format(auth_type, client_iqn))
-
     logger.info("START - Client configuration started : {}".format(client_iqn))
 
     # The client is defined using the GWClient class. This class handles client attribute updates,
     # rados configuration object updates and LIO settings. Since the logic is external to this
     # custom module, clients can be created/deleted by other methods in the same manner.
     client = GWClient(logger, client_iqn, image_list, chap)
+    if client.error:
+        module.fail_json(msg=client.error_msg)
 
     client.manage(desired_state)
-
     if client.error:
         module.fail_json(msg=client.error_msg)
 
