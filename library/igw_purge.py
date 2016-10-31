@@ -42,6 +42,7 @@ from ansible.module_utils.basic import *
 import ceph_iscsi_config.settings as settings
 from ceph_iscsi_config.common import Config
 from ceph_iscsi_config.lio import LIO, Gateway
+from ceph_iscsi_config.utils import ipv4_addresses, get_ip
 
 
 def delete_group(module, image_list, cfg):
@@ -72,21 +73,26 @@ def delete_rbd(module, rbd_path):
     return True if rc == 0 else False
 
 
-def get_update_host(config):
+def is_cleanup_host(config):
     """
-    decide which gateway host should be responsible for any config object updates
+    decide which gateway host should be responsible for any non-specific updates to the
+    config object
     :param config: configuration dict from the rados pool
-    :return: a suitable gateway host that is online
+    :return: boolean indicating whether the addition cleanup should be performed
+             by the running host
     """
+    cleanup = False
 
-    ptr = 0
-    potential_hosts = [host_name for host_name in config["gateways"].keys()
-                       if isinstance(config["gateways"][host_name], dict)]
+    if 'ip_list' in config.config["gateways"]:
 
-    # Assume the 1st element from the list is OK for now
-    # TODO check the potential hosts are online/available
+        gw_1 = config.config["gateways"]["ip_list"][0]
 
-    return potential_hosts[ptr]
+        usable_ip = get_ip(gw_1)
+        if usable_ip != '0.0.0.0':
+            if usable_ip in ipv4_addresses():
+                cleanup = True
+
+    return cleanup
 
 
 def ansible_main():
@@ -106,41 +112,45 @@ def ansible_main():
     logger.info("START - GATEWAY configuration PURGE started, run mode is {}".format(run_mode))
     cfg = Config(logger)
     this_host = socket.gethostname().split('.')[0]
+    perform_cleanup_tasks = is_cleanup_host(cfg)
 
     #
     # Purge gateway configuration, if the config has gateways
     if run_mode == 'gateway' and len(cfg.config['gateways'].keys()) > 0:
 
-        update_host = get_update_host(cfg.config)
         lio = LIO()
         gateway = Gateway(cfg)
 
         if gateway.session_count() > 0:
             module.fail_json(msg="Unable to purge - gateway still has active sessions")
 
-        gateway.drop_target(this_host, True)
+        gateway.drop_target(this_host)
         if gateway.error:
             module.fail_json(msg=gateway.error_msg)
 
-        lio.drop_lun_maps(cfg, True)
+        lio.drop_lun_maps(cfg, perform_cleanup_tasks)
         if lio.error:
             module.fail_json(msg=lio.error_msg)
 
         if gateway.changed or lio.changed:
 
-            if this_host == update_host:
-                cfg.reset = True
-                gw_keys = cfg.config["gateways"].keys()
-                for key in gw_keys:
-                    cfg.del_item("gateways", key)
+            # each gateway removes it's own entry from the config
+            cfg.del_item("gateways", this_host)
 
+            if perform_cleanup_tasks:
+                cfg.reset = True
+
+                # drop all client definitions from the configuration object
                 client_names = cfg.config["clients"].keys()
                 for client in client_names:
                     cfg.del_item("clients", client)
 
-                cfg.commit()
+                cfg.del_item("gateways", "iqn")
+                cfg.del_item("gateways", "created")
+                cfg.del_item("gateways", "ip_list")
 
-            lio.save_config()
+            cfg.commit()
+
             changes_made = True
 
     elif run_mode == 'disks' and len(cfg.config['disks'].keys()) > 0:
