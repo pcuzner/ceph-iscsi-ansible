@@ -1,4 +1,7 @@
 ---
+  - name: Ensure the local store for the clusters conf and keys is available
+    run_once: True
+    local_action: file path=/root/ceph-iscsi-conf state=directory mode=0755
 
   # This deployment runs after a ceph-ansible run, so we can use the
   # one of the ceph mon's to seed the configuration of the gateways
