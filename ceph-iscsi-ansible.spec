@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        1.4
+Version:        1.5
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
 License:        ASL 2.0
@@ -49,6 +49,11 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
+* Fri Nov 04 2016 Paul Cuzner <pcuzner@redhat.com> - 1.5-1
+- playbook now seeds the configuration directory on ansible host (rhbz 1390026)
+- resolve a 1.4 regression affecting the igw_purge module
+- fail gracefully if bogus client name is given (rhbz 1390023)
+
 * Thu Oct 27 2016 Paul Cuzner <pcuzner@redhat.com> - 1.4-1
 - clients can now be added without images or chap defined using null strings
 - changed parameters for client definition to position for other auth mechanisms
