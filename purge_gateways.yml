@@ -32,4 +32,7 @@
       igw_purge: mode="disks"
       when: igw_purge_type == 'all'
 
+    - name: restart rbd-target-gw daemons
+      service: name=rbd-target-gw state=restarted
+
 
