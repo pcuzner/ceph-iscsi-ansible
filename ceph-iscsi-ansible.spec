@@ -1,5 +1,5 @@
 Name:           ceph-iscsi-ansible
-Version:        1.5
+Version:        2.0
 Release:        1%{?dist}
 Summary:        Ansible playbooks for deploying LIO iscsi gateways in front of a Ceph cluster
 License:        ASL 2.0
@@ -49,6 +49,9 @@ done
 %exclude %{_datarootdir}/ceph-ansible/library/igw*.pyc
 
 %changelog
+* Fri Jan 13 2017 Paul Cuzner <pcuzner@redhat.com> - 2.0-1
+- converted from device-mapper/krbd to TCMU based rbd configurations
+
 * Fri Nov 04 2016 Paul Cuzner <pcuzner@redhat.com> - 1.5-1
 - playbook now seeds the configuration directory on ansible host (rhbz 1390026)
 - resolve a 1.4 regression affecting the igw_purge module
