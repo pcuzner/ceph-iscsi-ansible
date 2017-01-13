@@ -69,7 +69,7 @@ author:
   - 'Paul Cuzner'
 
 """
-
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -114,17 +114,22 @@ def ansible_main():
     # Validate the parameters passed from Ansible  #
     ################################################
     if not valid_size(size):
-        logger.critical("image '{}' has an invalid size specification '{}' in the ansible configuration".format(image,
-                                                                                                         size))
-        module.fail_json(msg="(main) Unable to use the size parameter '{}' for image '{}' from the playbook - "
-                             "must be a number suffixed by M, G or T".format(size, image))
+        logger.critical("image '{}' has an invalid size specification '{}' "
+                        "in the ansible configuration".format(image,
+                                                              size))
+        module.fail_json(msg="(main) Unable to use the size parameter '{}' "
+                             "for image '{}' from the playbook - "
+                             "must be a number suffixed by M,G "
+                             "or T".format(size,
+                                           image))
 
     # define a lun object and perform some initial parameter validation
     lun = LUN(logger, pool, image, size, allocating_host)
     if lun.error:
         module.fail_json(msg=lun.error_msg)
 
-    logger.info("START - LUN configuration started for {}/{}".format(pool, image))
+    logger.info("START - LUN configuration started for {}/{}".format(pool,
+                                                                     image))
 
     # attempt to create/allocate the LUN for LIO
     lun.manage(desired_state)
@@ -134,9 +139,11 @@ def ansible_main():
     if lun.num_changes == 0:
         logger.info("END   - No changes needed")
     else:
-        logger.info("END   - {} configuration changes made".format(lun.num_changes))
+        logger.info("END   - {} configuration changes "
+                    "made".format(lun.num_changes))
 
-    module.exit_json(changed=(lun.num_changes > 0), meta={"msg": "Configuration updated"})
+    module.exit_json(changed=(lun.num_changes > 0),
+                     meta={"msg": "Configuration updated"})
 
 
 if __name__ == '__main__':
@@ -147,7 +154,8 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('/var/log/ansible-module-igw_config.log',
                                   maxBytes=5242880,
                                   backupCount=7)
-    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
+    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : '
+                                '%(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 
