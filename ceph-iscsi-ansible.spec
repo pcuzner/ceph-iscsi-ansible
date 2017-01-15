@@ -17,10 +17,10 @@ The playbook defines the front-end iSCSI environment (target -> tpgN ->
 NodeACLS/client), as well as the underlying rbd definition for the rbd images
 to be exported over iSCSI.
 
-ceph-iscsi-gw.yml ... defines the LIO configuration(defined by
-                      group_vars/ceph-iscsi-gw.yml)
-purge_gateways.yml .. deletes the LIO configuration, and optionally rbd's from
-                      the environment
+ceph-iscsi-gw.yml ......... defines the LIO configuration(defined by
+                            group_vars/ceph-iscsi-gw.yml)
+purge-iscsi-gateways.yml .. deletes the LIO configuration, and optionally rbd's
+                            from the environment
 
 NB: The playbooks are dependent upon the ceph-iscsi-config package being
 installed/available to the hosts that will become iSCSI gateways.
@@ -33,7 +33,7 @@ installed/available to the hosts that will become iSCSI gateways.
 %install
 mkdir -p %{buildroot}%{_datarootdir}/ceph-ansible
 
-for f in group_vars library roles ceph-iscsi-gw.yml purge_gateways.yml; do
+for f in group_vars library roles ceph-iscsi-gw.yml purge-iscsi-gateways.yml; do
   cp -a $f %{buildroot}%{_datarootdir}/ceph-ansible
 done
 
@@ -41,7 +41,7 @@ done
 %doc LICENSE
 %doc README
 %{_datarootdir}/ceph-ansible/ceph-iscsi-gw.yml
-%{_datarootdir}/ceph-ansible/purge_gateways.yml
+%{_datarootdir}/ceph-ansible/purge-iscsi-gateways.yml
 %{_datarootdir}/ceph-ansible/group_vars/ceph-iscsi-gw.sample
 %{_datarootdir}/ceph-ansible/roles/ceph-iscsi-gw
 %{_datarootdir}/ceph-ansible/library/igw*
@@ -51,6 +51,8 @@ done
 %changelog
 * Fri Jan 13 2017 Paul Cuzner <pcuzner@redhat.com> - 2.0-1
 - converted from device-mapper/krbd to TCMU based rbd configurations
+- renamed iscsi-gateway config file to use .cfg extension
+- renamed purge playbook to match naming in ceph-ansible
 
 * Fri Nov 04 2016 Paul Cuzner <pcuzner@redhat.com> - 1.5-1
 - playbook now seeds the configuration directory on ansible host (rhbz 1390026)
