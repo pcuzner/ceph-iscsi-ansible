@@ -12,7 +12,7 @@
   - name: (local) Create SSL crt/key files
     run_once: True
     local_action:
-      module: shell cd /root/ceph-iscsi-conf; openssl req -newkey rsa:2048 -nodes -keyout iscsi-gateway.key -x509 -days 365 -out iscsi-gateway.crt -subj "/C=US/ST=./L=./O=RedHat/OU=Linux/CN=iscsi-gateway"
+      module: shell cd /root/ceph-iscsi-conf; openssl req -newkey rsa:2048 -nodes -keyout iscsi-gateway.key -x509 -days 365 -out iscsi-gateway.crt -subj "/C=US/ST=./L=./O=RedHat/OU=Linux/CN={{ ansible_hostname }}"
     when: conf_files.stdout.find('iscsi-gateway.crt') == -1
 
   - name: (local) Create PEM
