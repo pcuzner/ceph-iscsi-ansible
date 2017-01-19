@@ -16,6 +16,11 @@
 - include: deploy_gw_conf.yml
   when: ansible_os_family == "RedHat" and ( deploy_settings is undefined or deploy_settings )
 
+# deploy_ssl_keys used the ansible controller to create self-signed crt/key/pub files
+# and transfers them to /etc/ceph directory on each controller. SSL certs are used by
+# the API for https support.
+- include: deploy_ssl_keys.yml
+
 - name: igw_gateway (tgt) | Configure iSCSI Target (gateway)
   igw_gateway: mode="target" gateway_iqn={{ gateway_iqn }} gateway_ip_list={{ gateway_ip_list }}
   register: target
