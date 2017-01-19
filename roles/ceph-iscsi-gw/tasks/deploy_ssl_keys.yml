@@ -47,3 +47,11 @@
   - name: Copy pub-key if needed
     copy: src=/root/ceph-iscsi-conf/iscsi-gateway-pub.key dest=/etc/ceph/.
     when: "'iscsi-gateway-pub.key' not in etc_ceph.stdout"
+
+  - name: Lock SSL file access to root only
+    file: path={{ item }} mode=0400
+    with_items:
+      - /etc/ceph/iscsi-gateway.crt
+      - /etc/ceph/iscsi-gateway.key
+      - /etc/ceph/iscsi-gateway.pem
+      - /etc/ceph/iscsi-gateway-pub.key
