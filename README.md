@@ -4,14 +4,14 @@ provided rely upon configuration logic from the "ceph-iscsi-config" project. Thi
 configuration logic, potentially opening up the possibility for puppet/chef to create/manage ceph/iSCSI gateways in the  
 same way.  
 
-##Introduction
+## Introduction
 At a high level, this project provides custom modules which are responsible for calling the configuration logic, together  
 with the relevant playbooks. The project defines a new ceph-ansible role; ceph-iscsi-gw, together with two playbooks;  
 
 - **ceph-iscsi-gw-yml** ... to define our change the gateway configuration based on group_vars/ceph-iscsi-gw.yml  
 - **purge_gateways.yml** .. to destroy the LIO configuration, or the LIO and any associated rbd images.
 
-##Features    
+## Features    
 The combination of the playbooks and the configuration logic deliver the following features;  
 
 - confirms RHEL7.3 and aborts if necessary  
@@ -35,36 +35,36 @@ The combination of the playbooks and the configuration logic deliver the followi
 - configuration can be wiped with the purge_gateway playbook  
 - current state can be seen by looking at the configuration object (stored in the rbd pool)  
 
-###Why RHEL 7.3?
+### Why RHEL 7.3?
 There are several system dependencies that are required to ensure the correct (i.e. don't eat my data!) behaviors when OSD connectivity  
 or gateway nodes fail. RHEL 7.3 delivers the necessary kernel changes, and also provides an updated multipathd, enabling rbd images  
 to be managed by multipathd.
 
-##Prerequisites  
+## Prerequisites  
 * a working ceph cluster ( *rbd pool defined* )
 * a server/host with ceph-ansible installed and working
 * nodes intended to be gateways should be at least ceph clients, with the ability to create and map rbd images  
   
 
-##Testing So far
+## Testing So far
 The solution has been tested on a collocated cluster where the osd/mons and gateways all reside on the same node.  
 
-##Quick Start
-###Prepare the iSCSI Gateway Nodes  
+## Quick Start
+### Prepare the iSCSI Gateway Nodes  
 1. install the ceph-iscsi-config package on the nodes, intended to be gateways. NB. The playbook includes a check for the presence  
  of this rpm (https://github.com/pcuzner/ceph-iscsi-config)
 
-###Install the ansible playbooks
-1. installed the ceph-iscsi-ansible rpm from the packages directory on the node where you already have ceph-ansible deploy  
+### Install the ansible playbooks
+1. install the ceph-iscsi-ansible rpm from the packages directory on the node where you already have ceph-ansible installed.  
 2. update /etc/ansible/hosts to include a host group (ceph-iscsi-gw) for the nodes that you want to become iscsi gateways  
 3. make a copy of the group_vars/ceph-iscsi-gw.sample file called ceph-iscsi-gw, and update it to define the environment you want  
 4. run the playbook  
   ```> ansible-playbook ceph-iscsi-gw.yml```
   
-##Purging the configuration
+## Purging the configuration
 As mentioned above, the project provides a purge-gateways.yml playbook which can remove the LIO configuration alone, or remove   
 both LIO and all associated rbd images that have been declared in the group_vars/ceph-iscsi-gw file. The purge playbook will  
 check for any active iscsi sessions, and abort if any are found.
     
-##Known Issues and Considerations  
+## Known Issues and Considerations  
 1. the ceph cluster name is the default 'ceph', so the corresponding configuration file /etc/ceph/ceph.conf is assumed to be valid
