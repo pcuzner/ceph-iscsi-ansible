@@ -6,4 +6,12 @@
 [config]
 cluster_name = {{ cluster_name | default ('ceph') }}
 gateway_keyring = {{ gateway_keyring | default ('/etc/ceph/ceph.client.admin.keyring') }}
-
+#
+#
+# Optional settings related to the CLI/API service
+#api_user = admin
+#api_password = admin
+#api_port = 5001
+#api_secure = true
+#loop_delay = .5
+#trusted_ip_list = 192.168.122.1

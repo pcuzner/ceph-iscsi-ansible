@@ -14,11 +14,11 @@ description:
     * rbd maps to the gateway and registration of those rbds as LUNs to the
       kernels LIO subsystem
 
-    The actual configuration modules are provided by ceph-iscsi-config rpm which
-    is installed on the gateway nodes.
+    The actual configuration modules are provided by ceph-iscsi-config rpm
+    which is installed on the gateway nodes.
 
-    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
-    on the target machine(s).
+    To support module debugging, this module logs to
+    /var/log/ansible-module-igw_config.log on the target machine(s).
 
 option:
   gateway_iqn:
@@ -32,9 +32,10 @@ option:
       - comma separated string providing the IP addresses that will be used
         as iSCSI portal IPs to accept iscsi client connections. Each IP address
         should equate to an IP on a gateway node - typically dedicated to iscsi
-        traffic. The order of the IP addresses determines the TPG sequence within
-        the target definition - so once defined, new gateways can be added but
-        *must* be added to the end of this list to preserve the tpg sequence
+        traffic. The order of the IP addresses determines the TPG sequence
+        within the target definition - so once defined, new gateways can be
+        added but *must* be added to the end of this list to preserve the tpg
+        sequence
 
         e.g. 192.168.122.101,192.168.122.103
     required: true
@@ -89,24 +90,30 @@ def ansible_main():
     mode = module.params['mode']
 
     if not valid_ip(gateway_ip_list):
-        module.fail_json(msg="Invalid gateway IP address(es) provided - port 22 check failed ({})".format(gateway_ip_list))
+        module.fail_json(msg="Invalid gateway IP address(es) provided - port "
+                             "22 check failed ({})".format(gateway_ip_list))
 
-    logger.info("START - GATEWAY configuration started in mode {}".format(mode))
+    logger.info("START - GATEWAY configuration started - mode {}".format(mode))
 
     gateway = GWTarget(logger, gateway_iqn, gateway_ip_list)
     if gateway.error:
-        logger.critical("(ansible_main) Gateway init failed - {}".format(gateway.error_msg))
-        module.fail_json(msg="iSCSI gateway initialisation failed ({})".format(gateway.error_msg))
+        logger.critical("(ansible_main) Gateway init failed - "
+                        "{}".format(gateway.error_msg))
+        module.fail_json(msg="iSCSI gateway initialisation failed "
+                             "({})".format(gateway.error_msg))
 
     gateway.manage(mode)
 
     if gateway.error:
-        logger.critical("(main) Gateway creation or load failed, unable to continue")
-        module.fail_json(msg="iSCSI gateway creation/load failure ({})".format(gateway.error_msg))
+        logger.critical("(main) Gateway creation or load failed, "
+                        "unable to continue")
+        module.fail_json(msg="iSCSI gateway creation/load failure "
+                             "({})".format(gateway.error_msg))
 
 
     logger.info("END - GATEWAY configuration complete")
-    module.exit_json(changed=gateway.changes_made, meta={"msg": "Gateway setup complete"})
+    module.exit_json(changed=gateway.changes_made,
+                     meta={"msg": "Gateway setup complete"})
 
 
 if __name__ == '__main__':
@@ -117,7 +124,8 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('/var/log/ansible-module-igw_config.log',
                                   maxBytes=5242880,
                                   backupCount=7)
-    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
+    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : '
+                                '%(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 

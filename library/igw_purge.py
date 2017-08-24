@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 
-__author__ = 'pcuzner@redhat.com'
-
 DOCUMENTATION = """
 ---
 module: igw_purge
-short_description: Provide a purge capability to remove an iSCSI gateway environment
+short_description: Provide a purge capability to remove an iSCSI gateway
+environment
 description:
-  - This module handles the removal of a gateway configuration from a ceph environment.
-    The playbook that calls this module prompts the user for the type of purge to perform.
+  - This module handles the removal of a gateway configuration from a ceph
+    environment.
+    The playbook that calls this module prompts the user for the type of purge
+    to perform.
     The purge options are;
     all ... purge all LIO configuration *and* delete all defined rbd images
     lio ... purge only the LIO configuration (rbd's are left intact)
 
     USE WITH CAUTION
 
-    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
-    on the target machine(s).
+    To support module debugging, this module logs to
+    /var/log/ansible-module-igw_config.log on each target machine(s).
 
 option:
   mode:
@@ -33,6 +34,7 @@ author:
 
 """
 
+import os
 import logging
 import socket
 
@@ -43,6 +45,8 @@ import ceph_iscsi_config.settings as settings
 from ceph_iscsi_config.common import Config
 from ceph_iscsi_config.lio import LIO, Gateway
 from ceph_iscsi_config.utils import ipv4_addresses, get_ip
+
+__author__ = 'pcuzner@redhat.com'
 
 
 def delete_group(module, image_list, cfg):
@@ -75,11 +79,11 @@ def delete_rbd(module, rbd_path):
 
 def is_cleanup_host(config):
     """
-    decide which gateway host should be responsible for any non-specific updates to the
-    config object
+    decide which gateway host should be responsible for any non-specific
+    updates to the config object
     :param config: configuration dict from the rados pool
-    :return: boolean indicating whether the addition cleanup should be performed
-             by the running host
+    :return: boolean indicating whether the addition cleanup should be
+    performed by the running host
     """
     cleanup = False
 
@@ -109,7 +113,8 @@ def ansible_main():
     run_mode = module.params['mode']
     changes_made = False
 
-    logger.info("START - GATEWAY configuration PURGE started, run mode is {}".format(run_mode))
+    logger.info("START - GATEWAY configuration PURGE started, run mode "
+                "is {}".format(run_mode))
     cfg = Config(logger)
     this_host = socket.gethostname().split('.')[0]
     perform_cleanup_tasks = is_cleanup_host(cfg)
@@ -122,7 +127,8 @@ def ansible_main():
         gateway = Gateway(cfg)
 
         if gateway.session_count() > 0:
-            module.fail_json(msg="Unable to purge - gateway still has active sessions")
+            module.fail_json(msg="Unable to purge - gateway still has active "
+                                 "sessions")
 
         gateway.drop_target(this_host)
         if gateway.error:
@@ -155,22 +161,27 @@ def ansible_main():
 
     elif run_mode == 'disks' and len(cfg.config['disks'].keys()) > 0:
         #
-        # Remove the disks on this host, that have been registered in the config object
+        # Remove the disks on this host, that have been registered in the
+        # config object
         #
-        # if the owner field for a disk is set to this host, this host can safely delete it
+        # if the owner field for a disk is set to this host, this host can
+        # safely delete it
         # nb. owner gets set at rbd allocation and mapping time
         images_left = []
 
-        # delete_list will contain a list of pool/image names where the owner is this host
+        # delete_list will contain a list of pool/image names where the owner
+        # is this host
         delete_list = [key.replace('.', '/', 1) for key in cfg.config['disks']
                        if cfg.config['disks'][key]['owner'] == this_host]
 
         if delete_list:
             images_left = delete_group(module, delete_list, cfg)
 
-        # if the delete list still has entries we had problems deleting the images
+        # if the delete list still has entries we had problems deleting the
+        # images
         if images_left:
-            module.fail_json(msg="Problems deleting the following rbd's : {}".format(','.join(images_left)))
+            module.fail_json(msg="Problems deleting the following rbd's : "
+                                 "{}".format(','.join(images_left)))
 
         changes_made = cfg.changed
 
@@ -178,7 +189,10 @@ def ansible_main():
 
     logger.info("END   - GATEWAY configuration PURGE complete")
 
-    module.exit_json(changed=changes_made, meta={"msg": "Purge of iSCSI settings ({}) complete".format(run_mode)})
+    module.exit_json(changed=changes_made,
+                     meta={"msg": "Purge of iSCSI settings ({}) "
+                                  "complete".format(run_mode)})
+
 
 if __name__ == '__main__':
 
@@ -188,7 +202,8 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('/var/log/ansible-module-igw_config.log',
                                   maxBytes=5242880,
                                   backupCount=7)
-    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
+    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : '
+                                '%(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 

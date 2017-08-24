@@ -9,14 +9,14 @@ short_description: Manage iscsi gateway client definitions
 description:
   - This module calls the 'client' configuration management module installed
     on the iscsi gateway node to handle the definition of iscsi clients on the
-    gateway(s). This definition will setup iscsi authentication (e.g. chap), and
-    mask the required rbd images to the client.
+    gateway(s). This definition will setup iscsi authentication (e.g. chap),
+    and mask the required rbd images to the client.
 
     The 'client' configuration module is provided by ceph-iscsi-config
     rpm which is installed on the gateway nodes.
 
-    To support module debugging, this module logs to /var/log/ansible-module-igw_config.log
-    on the target machine(s).
+    To support module debugging, this module logs to
+    /var/log/ansible-module-igw_config.log on the target machine(s).
 
 option:
   client_iqn:
@@ -53,6 +53,7 @@ author:
 
 """
 
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 from ansible.module_utils.basic import *
@@ -91,9 +92,10 @@ def ansible_main():
 
     logger.info("START - Client configuration started : {}".format(client_iqn))
 
-    # The client is defined using the GWClient class. This class handles client attribute updates,
-    # rados configuration object updates and LIO settings. Since the logic is external to this
-    # custom module, clients can be created/deleted by other methods in the same manner.
+    # The client is defined using the GWClient class. This class handles
+    # client attribute updates, rados configuration object updates and LIO
+    # settings. Since the logic is external to this custom module, clients
+    # can be created/deleted by other methods in the same manner.
     client = GWClient(logger, client_iqn, image_list, chap)
     if client.error:
         module.fail_json(msg=client.error_msg)
@@ -102,12 +104,14 @@ def ansible_main():
     if client.error:
         module.fail_json(msg=client.error_msg)
 
-    logger.info("END   - Client configuration complete - {} changes made".format(client.change_count))
+    logger.info("END   - Client configuration complete - {} "
+                "changes made".format(client.change_count))
 
     changes_made = True if client.change_count > 0 else False
 
-    module.exit_json(changed=changes_made, meta={"msg": "Client definition completed {} "
-                                                 "changes made".format(client.change_count)})
+    module.exit_json(changed=changes_made,
+                     meta={"msg": "Client definition completed {} "
+                                  "changes made".format(client.change_count)})
 
 if __name__ == '__main__':
 
@@ -117,7 +121,8 @@ if __name__ == '__main__':
     handler = RotatingFileHandler('/var/log/ansible-module-igw_config.log',
                                   maxBytes=5242880,
                                   backupCount=7)
-    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : %(message)s')
+    log_fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s : '
+                                '%(message)s')
     handler.setFormatter(log_fmt)
     logger.addHandler(handler)
 

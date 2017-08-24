@@ -5,43 +5,10 @@
   - name: Check required rpms are installed
     yum: name={{ item.rpm }} state=latest
     with_items:
-      - rpm: device-mapper-multipath
+      - rpm: tcmu-runner
       - rpm: ceph-iscsi-config
       - rpm: targetcli
       - rpm: ceph-common
-
-  - name: check multipath.conf file state
-    stat: path=/etc/multipath.conf
-    register: mpathconf
-
-  - name: configure new multipath.conf
-    command: mpathconf  --enable --with_multipathd y --user_friendly_names n --find_multipaths n
-    register: conf_created
-    when: mpathconf.stat.exists == False
-
-  - name: read multipath.conf settings
-    command: cat /etc/multipath.conf
-    register: mpathout
-
-  - name: replace any existing kpartx setting
-    lineinfile: dest=/etc/multipath.conf  state='present' regexp="skip_kpartx no" line="\tskip_kpartx yes" backrefs=yes
-    when: mpathout.stdout.find("skip_kpartx") != -1
-
-  - name: insert new skip_kpartx setting
-    lineinfile: dest=/etc/multipath.conf  state='present' insertafter="^defaults" line="\tskip_kpartx yes"
-    when: mpathout.stdout.find("skip_kpartx") == -1
-
-  - name: Read multipath settings
-    command: mpathconf
-    register: mpath_settings
-    when: mpathconf.stat.exists == True
-
-  - name: ensure user friendly names is disabled
-    command: mpathconf  --enable --with_multipathd y --user_friendly_names n --find_multipaths n
-    when: conf_created.changed == False and ("find_multipaths is enabled" in mpath_settings.stdout or "user_friendly_names is enabled" in mpath_settings.stdout)
-
-  - name: multipathd enabled and started
-    service: name=multipathd state=started enabled=yes
 
   - name: check the status of the target.service override
     stat: path=/etc/systemd/system/target.service
@@ -51,16 +18,6 @@
     shell: systemctl disable target.service && systemctl mask target.service
     when: target.stat.exists == False or (target.stat.exists and target.stat.islnk == False)
 
-  - name: reading lvm.conf
-    shell: cat /etc/lvm/lvm.conf
-    register: lvm_conf
-    changed_when: false
+  - name: Enable the rbd-target-gw service and make sure it's running
+    service: name=rbd-target-gw enabled=yes state=started
 
-  - name: add exclusion for rbd dm devices to lvm.conf if it's not already there
-    lineinfile: dest=/etc/lvm/lvm.conf  state='present' insertafter="# global_filter =" line='\tglobal_filter = [ "r|^/dev/mapper/[0-255]-.*|" ]'
-    when: '"/dev/mapper/[0-255]-" not in lvm_conf.stdout'
-    register: lvm_conf_updated
-
-  - name: refresh lvm following update to lvm.conf
-    shell: vgscan && lvmdiskscan
-    when: lvm_conf_updated.changed
