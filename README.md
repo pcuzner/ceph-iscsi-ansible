@@ -14,14 +14,11 @@ with the relevant playbooks. The project defines a new ceph-ansible role; ceph-i
 ## Features    
 The combination of the playbooks and the configuration logic deliver the following features;  
 
-- confirms RHEL7.3 and aborts if necessary  
-- ensures targetcli/device-mapper-multipath is installed (for rtslib support)  
-- configures multipath.conf  
+- confirms RHEL7.4 and aborts if necessary  
+- ensures targetcli is installed (for rtslib support)  
 - creates rbd's if needed - at allocation time, each rbd is assigned an owner, which will become the preferred path    
 - checks the size of the rbds at run time and expands if necessary  
 - maps the rbd's to the host (gateway)  
-- enables the rbdmap service to start on boot, and reconfigures the target service to be dependent on rbdmap  
-- adds the rbd's to the /etc/ceph/rbdmap file ensuring the devices are automatically mapped following a gateway reboot  
 - maps these rbds to LIO  
 - once mapped, the alua preferred path state is set or cleared (supporting an active/passive topology)    
 - creates an iscsi target - common iqn, and multiple tpg's  
@@ -35,10 +32,9 @@ The combination of the playbooks and the configuration logic deliver the followi
 - configuration can be wiped with the purge_gateway playbook  
 - current state can be seen by looking at the configuration object (stored in the rbd pool)  
 
-### Why RHEL 7.3?
+### Why RHEL 7.4?
 There are several system dependencies that are required to ensure the correct (i.e. don't eat my data!) behaviors when OSD connectivity  
-or gateway nodes fail. RHEL 7.3 delivers the necessary kernel changes, and also provides an updated multipathd, enabling rbd images  
-to be managed by multipathd.
+or gateway nodes fail. RHEL 7.4 delivers the necessary kernel changes.
 
 ## Prerequisites  
 * a working ceph cluster ( *rbd pool defined* )
