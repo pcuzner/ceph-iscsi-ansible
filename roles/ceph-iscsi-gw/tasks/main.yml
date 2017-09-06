@@ -1,10 +1,17 @@
 ---
 
-- name: OS Compatibility Check (RHEL 7.3)
-  assert: 
-    that:
-      - "ansible_distribution == 'RedHat'"
-      - "ansible_distribution_version == '7.3'"
+- name: fail on unsupported distribution for iscsi gateways
+  fail:
+    msg: "iSCSI gateways can only be deployed on Red Hat Enterprise Linux"
+  when:
+    - ansible_distribution != 'RedHat'
+
+- name: fail on unsupported distribution version for iscsi gateways
+  fail:
+    msg: "iSCSI gateways can only be deployed on Red Hat Enterprise Linux >= 7.4"
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_version < '7.4'
 
 # handle the environment pre-req's for EL7, and package dependencies
 - include: pkgs_prereqs_el7.yml
